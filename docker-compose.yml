@@ -1,0 +1,60 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: senti_datos_personales_sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${DB_PASSWORD}"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - senti_datos_personales_sqldata:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: senti_datos_personales_db_init
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - ./docker/init:/docker-init
+    entrypoint: >
+      /bin/bash -c "
+      /opt/mssql-tools18/bin/sqlcmd -C -S sqlserver -U sa -P \"$$MSSQL_SA_PASSWORD\" -i /docker-init/create-database.sql
+      "
+    environment:
+      MSSQL_SA_PASSWORD: "${DB_PASSWORD}"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: senti_datos_personales_ms
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      PORT: "${PORT}"
+      # DB_HOST siempre es el nombre del servicio (red interna de docker-compose),
+      # nunca "localhost" como en el .env de desarrollo local fuera de Docker.
+      DB_HOST: sqlserver
+      DB_PORT: 1433
+      DB_USERNAME: "${DB_USERNAME}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_DATABASE: "${DB_DATABASE}"
+      DB_ENCRYPT: "true"
+      DB_TRUST_SERVER_CERTIFICATE: "true"
+      DB_SYNCHRONIZE: "false"
+      DB_LOGGING: "false"
+    ports:
+      - "${PORT}:3000"
+
+volumes:
+  senti_datos_personales_sqldata:
