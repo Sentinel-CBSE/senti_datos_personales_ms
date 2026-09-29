@@ -24,17 +24,17 @@ jobs:
       - name: Build Docker image
         run: |
           docker build \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/sentinel:${{ github.sha }} \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/sentinel:latest \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/senti_datos_personales_ms:${{ github.sha }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/senti_datos_personales_ms:latest \
             .
 
       - name: Push Docker image
         run: |
           docker push \
-            ${{ secrets.DOCKERHUB_USERNAME }}/sentinel:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/senti_datos_personales_ms:${{ github.sha }}
 
           docker push \
-            ${{ secrets.DOCKERHUB_USERNAME }}/sentinel:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/senti_datos_personales_ms:latest
 
       - name: Trigger infrastructure pipeline
         run: |
