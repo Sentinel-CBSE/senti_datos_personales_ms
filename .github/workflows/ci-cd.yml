@@ -35,3 +35,15 @@ jobs:
 
           docker push \
             ${{ secrets.DOCKERHUB_USERNAME }}/sentinel:latest
+
+      - name: Trigger infrastructure pipeline
+        run: |
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            /repos/Sentinel-CBSE/senti_infra/dispatches \
+            -f event_type='deploy' \
+            -f client_payload[service]='senti_datos_personales_ms' \
+            -f client_payload[tag]='${{ github.sha }}'
+        env:
+          GH_TOKEN: ${{ secrets.INFRA_REPO_TOKEN }}
