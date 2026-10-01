@@ -11,19 +11,20 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
+
 import { UsersService } from './users.service';
 import { UserUpdateBodyDto } from './dto/user-update-body.dto';
 import { EmergencyContactRequestDto } from './dto/emergency-contact-request.dto';
 
 @ApiTags('Usuarios (Móvil)')
-@ApiHeader({ name: 'x-firebase-user-id', description: 'Firebase UID del usuario autenticado', required: true })
-@ApiHeader({ name: 'x-firebase-user-email', description: 'Email del usuario autenticado', required: true })
 @Controller('api/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Put('profile')
   @ApiOperation({ summary: 'Crear o actualizar el perfil del usuario autenticado (upsert)' })
+  @ApiHeader({ name: 'x-firebase-user-id', description: 'Firebase UID del usuario autenticado', required: true })
+  @ApiHeader({ name: 'x-firebase-user-email', description: 'Email del usuario autenticado', required: true })
   updateProfile(
     @Headers('x-firebase-user-id') uid: string,
     @Headers('x-firebase-user-email') email: string,
@@ -35,6 +36,8 @@ export class UsersController {
 
   @Post('emergency-contacts')
   @ApiOperation({ summary: 'Agregar un contacto de emergencia al usuario autenticado' })
+  @ApiHeader({ name: 'x-firebase-user-id', description: 'Firebase UID del usuario autenticado', required: true })
+  @ApiHeader({ name: 'x-firebase-user-email', description: 'Email del usuario autenticado', required: true })
   addEmergencyContact(
     @Headers('x-firebase-user-id') uid: string,
     @Headers('x-firebase-user-email') email: string,
