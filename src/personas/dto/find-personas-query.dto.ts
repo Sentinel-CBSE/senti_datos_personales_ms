@@ -3,11 +3,6 @@ import { Type } from 'class-transformer';
 import { IsBoolean, IsEmail, IsInt, IsOptional, IsString, Min } from 'class-validator';
 
 export class FindPersonasQueryDto {
-  @ApiPropertyOptional({ description: 'Filtrar por numero de identificacion exacto' })
-  @IsOptional()
-  @IsString()
-  numeroIdentificacion?: string;
-
   @ApiPropertyOptional({ description: 'Filtrar por correo exacto' })
   @IsOptional()
   @IsEmail()

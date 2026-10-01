@@ -1,18 +1,23 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
-  IsUUID,
   Length,
-  Matches,
+  MaxLength,
 } from 'class-validator';
-import { TipoIdentificacion } from '../../common/enums/tipo-identificacion.enum';
 import { TipoSangre } from '../../common/enums/tipo-sangre.enum';
 import { FactorRh } from '../../common/enums/factor-rh.enum';
 
 export class CreatePersonaDto {
+  @ApiProperty({ description: 'Firebase UID del usuario', example: 'abc123XYZdef456GHIjkl789MNO' })
+  @IsString()
+  @IsNotEmpty()
+  @Length(1, 128)
+  id: string;
+
   @ApiProperty({ example: 'Maria Fernanda Gomez' })
   @IsString()
   @IsNotEmpty()
@@ -23,29 +28,19 @@ export class CreatePersonaDto {
   @IsEmail()
   correo: string;
 
-  @ApiProperty({ enum: TipoIdentificacion, example: TipoIdentificacion.CC })
-  @IsEnum(TipoIdentificacion)
-  tipoIdentificacion: TipoIdentificacion;
-
-  @ApiProperty({ example: '1094567890' })
-  @IsString()
-  @Matches(/^[A-Za-z0-9]{4,20}$/, {
-    message: 'numeroIdentificacion debe contener entre 4 y 20 caracteres alfanumericos',
-  })
-  numeroIdentificacion: string;
-
-  @ApiProperty({ enum: TipoSangre, example: TipoSangre.O })
+  @ApiPropertyOptional({ enum: TipoSangre, example: TipoSangre.O })
   @IsEnum(TipoSangre)
-  tipoSangre: TipoSangre;
+  @IsOptional()
+  tipoSangre?: TipoSangre;
 
-  @ApiProperty({ enum: FactorRh, example: FactorRh.POSITIVO })
+  @ApiPropertyOptional({ enum: FactorRh, example: FactorRh.POSITIVO })
   @IsEnum(FactorRh)
-  factorRh: FactorRh;
+  @IsOptional()
+  factorRh?: FactorRh;
 
-  @ApiProperty({
-    description: 'Id de la EPS registrada en el catalogo (GET /eps)',
-    example: 'b3f1a0a0-6e8a-4b1a-9c1a-0f1a2b3c4d5e',
-  })
-  @IsUUID()
-  epsId: string;
+  @ApiPropertyOptional({ example: 'SURA' })
+  @IsString()
+  @MaxLength(150)
+  @IsOptional()
+  eps?: string;
 }

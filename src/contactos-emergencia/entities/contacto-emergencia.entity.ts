@@ -14,7 +14,7 @@ export class ContactoEmergencia {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'uniqueidentifier', name: 'persona_id' })
+  @Column({ type: 'nvarchar', length: 128, name: 'persona_id' })
   personaId: string;
 
   @ManyToOne(() => Persona, (persona) => persona.contactosEmergencia, {

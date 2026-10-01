@@ -4,10 +4,9 @@ import { Persona } from './entities/persona.entity';
 import { ContactoEmergencia } from '../contactos-emergencia/entities/contacto-emergencia.entity';
 import { PersonasService } from './personas.service';
 import { PersonasController } from './personas.controller';
-import { EpsModule } from '../eps/eps.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Persona, ContactoEmergencia]), EpsModule],
+  imports: [TypeOrmModule.forFeature([Persona, ContactoEmergencia])],
   controllers: [PersonasController],
   providers: [PersonasService],
   exports: [PersonasService],

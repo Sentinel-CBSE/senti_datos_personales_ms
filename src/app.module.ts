@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import databaseConfig from './config/database.config';
-import { EpsModule } from './eps/eps.module';
 import { PersonasModule } from './personas/personas.module';
 import { ContactosEmergenciaModule } from './contactos-emergencia/contactos-emergencia.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -30,9 +30,9 @@ import { ContactosEmergenciaModule } from './contactos-emergencia/contactos-emer
         autoLoadEntities: true,
       }),
     }),
-    EpsModule,
     PersonasModule,
     ContactosEmergenciaModule,
+    UsersModule,
   ],
 })
 export class AppModule {}

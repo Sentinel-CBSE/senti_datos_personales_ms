@@ -23,10 +23,14 @@ async function bootstrap() {
   const swaggerConfig = new DocumentBuilder()
     .setTitle('SENTI - Datos Personales MS')
     .setDescription(
-      'Microservicio encargado de la gestion de datos personales, informacion medica basica ' +
-        'y contactos de emergencia dentro del sistema SENTI de reporte de robos.',
+      'Microservicio encargado de la gestion de datos personales y contactos de emergencia ' +
+        'dentro del sistema SENTI de reporte de robos.\n\n' +
+        '**Endpoints móvil** → tag `Usuarios (Móvil)` — requieren `Authorization: Bearer <firebase_jwt>`. ' +
+        'El usuario se crea automáticamente en el primer PUT (lazy creation).\n\n' +
+        '**Endpoints internos** → tags `Personas (Interno)`, `Contactos de Emergencia (Interno)` — para uso entre microservicios.',
     )
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
   // La spec OpenAPI se sirve en /openapi.json (ademas de la UI en /docs) para que

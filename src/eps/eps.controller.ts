@@ -2,7 +2,7 @@ import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { EpsService } from './eps.service';
 
-@ApiTags('eps')
+@ApiTags('EPS (Interno)')
 @Controller('eps')
 export class EpsController {
   constructor(private readonly epsService: EpsService) {}

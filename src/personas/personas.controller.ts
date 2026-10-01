@@ -6,7 +6,6 @@ import {
   HttpCode,
   HttpStatus,
   Param,
-  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -17,7 +16,7 @@ import { CreatePersonaDto } from './dto/create-persona.dto';
 import { UpdatePersonaDto } from './dto/update-persona.dto';
 import { FindPersonasQueryDto } from './dto/find-personas-query.dto';
 
-@ApiTags('personas')
+@ApiTags('Personas (Interno)')
 @Controller('personas')
 export class PersonasController {
   constructor(private readonly personasService: PersonasService) {}
@@ -38,7 +37,7 @@ export class PersonasController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener el detalle completo de una persona' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(@Param('id') id: string) {
     return this.personasService.findOne(id);
   }
 
@@ -48,13 +47,13 @@ export class PersonasController {
       'Informacion resumida para el microservicio de reporte de robos: datos basicos + ' +
       'contactos de emergencia a notificar',
   })
-  getInfoParaRobo(@Param('id', ParseUUIDPipe) id: string) {
+  getInfoParaRobo(@Param('id') id: string) {
     return this.personasService.getInfoParaRobo(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Editar los datos personales de una persona' })
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdatePersonaDto) {
+  update(@Param('id') id: string, @Body() dto: UpdatePersonaDto) {
     return this.personasService.update(id, dto);
   }
 
@@ -65,7 +64,7 @@ export class PersonasController {
       'Desactivar una persona (soft delete: no se elimina el registro para conservar el ' +
       'historial de robos asociado)',
   })
-  deactivate(@Param('id', ParseUUIDPipe) id: string) {
+  deactivate(@Param('id') id: string) {
     return this.personasService.deactivate(id);
   }
 }

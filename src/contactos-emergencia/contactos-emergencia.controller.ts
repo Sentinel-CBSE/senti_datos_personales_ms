@@ -15,7 +15,7 @@ import { ContactosEmergenciaService } from './contactos-emergencia.service';
 import { CreateContactoEmergenciaDto } from './dto/create-contacto-emergencia.dto';
 import { UpdateContactoEmergenciaDto } from './dto/update-contacto-emergencia.dto';
 
-@ApiTags('contactos-emergencia')
+@ApiTags('Contactos de Emergencia (Interno)')
 @Controller('personas/:personaId/contactos-emergencia')
 export class PersonaContactosEmergenciaController {
   constructor(private readonly contactosService: ContactosEmergenciaService) {}
@@ -25,7 +25,7 @@ export class PersonaContactosEmergenciaController {
     summary: 'Agregar un contacto de emergencia a una persona (disponible en cualquier momento)',
   })
   create(
-    @Param('personaId', ParseUUIDPipe) personaId: string,
+    @Param('personaId') personaId: string,
     @Body() dto: CreateContactoEmergenciaDto,
   ) {
     return this.contactosService.create(personaId, dto);
@@ -33,12 +33,12 @@ export class PersonaContactosEmergenciaController {
 
   @Get()
   @ApiOperation({ summary: 'Listar los contactos de emergencia de una persona' })
-  findAll(@Param('personaId', ParseUUIDPipe) personaId: string) {
+  findAll(@Param('personaId') personaId: string) {
     return this.contactosService.findAllByPersona(personaId);
   }
 }
 
-@ApiTags('contactos-emergencia')
+@ApiTags('Contactos de Emergencia (Interno)')
 @Controller('contactos-emergencia')
 export class ContactosEmergenciaController {
   constructor(private readonly contactosService: ContactosEmergenciaService) {}
