@@ -18,19 +18,10 @@ export class UsersService {
     private readonly contactoRepository: Repository<ContactoEmergencia>,
   ) {}
 
-  extractFirebaseInfo(authHeader: string | undefined): { uid: string; email: string } {
-    if (!authHeader) throw new UnauthorizedException('Authorization header requerido');
-    const token = authHeader.replace(/^Bearer\s+/i, '');
-    const parts = token.split('.');
-    if (parts.length < 2) throw new UnauthorizedException('Token inválido');
-
-    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-    const payload = JSON.parse(Buffer.from(base64, 'base64').toString('utf-8'));
-
-    if (!payload.sub || !payload.email) {
-      throw new UnauthorizedException('Token sin uid o email');
-    }
-    return { uid: payload.sub as string, email: payload.email as string };
+  extractFirebaseInfo(uid: string | undefined, email: string | undefined): { uid: string; email: string } {
+    if (!uid) throw new UnauthorizedException('Header X-Firebase-User-Id requerido');
+    if (!email) throw new UnauthorizedException('Header X-Firebase-User-Email requerido');
+    return { uid, email };
   }
 
   async upsertProfile(uid: string, email: string, dto: UserUpdateBodyDto): Promise<UserResponseDto> {
