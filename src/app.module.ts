@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import databaseConfig from './config/database.config';
-import { PersonasModule } from './personas/personas.module';
-import { ContactosEmergenciaModule } from './contactos-emergencia/contactos-emergencia.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -30,8 +28,6 @@ import { UsersModule } from './users/users.module';
         autoLoadEntities: true,
       }),
     }),
-    PersonasModule,
-    ContactosEmergenciaModule,
     UsersModule,
   ],
 })
