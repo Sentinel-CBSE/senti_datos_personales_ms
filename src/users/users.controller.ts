@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Headers,
   HttpCode,
   HttpStatus,
@@ -20,6 +21,18 @@ import { EmergencyContactRequestDto } from './dto/emergency-contact-request.dto'
 @Controller('api/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Get('profile/data')
+  @ApiOperation({ summary: 'Obtener el perfil del usuario autenticado' })
+  @ApiHeader({ name: 'x-firebase-user-id', description: 'Firebase UID del usuario autenticado', required: true })
+  @ApiHeader({ name: 'x-firebase-user-email', description: 'Email del usuario autenticado', required: true })
+  getProfile(
+    @Headers('x-firebase-user-id') uid: string,
+    @Headers('x-firebase-user-email') email: string,
+  ) {
+    this.usersService.extractFirebaseInfo(uid, email);
+    return this.usersService.getProfile(uid);
+  }
 
   @Put('profile')
   @ApiOperation({ summary: 'Crear o actualizar el perfil del usuario autenticado (upsert)' })

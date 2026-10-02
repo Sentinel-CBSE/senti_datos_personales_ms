@@ -24,6 +24,13 @@ export class UsersService {
     return { uid, email };
   }
 
+  async getProfile(uid: string): Promise<UserResponseDto> {
+    const persona = await this.personaRepository.findOne({ where: { id: uid } });
+    if (!persona) throw new NotFoundException(`Usuario ${uid} no encontrado`);
+    const contacts = await this.contactoRepository.find({ where: { personaId: uid } });
+    return this.toUserResponse(persona, contacts);
+  }
+
   async upsertProfile(uid: string, email: string, dto: UserUpdateBodyDto): Promise<UserResponseDto> {
     let persona = await this.personaRepository.findOne({ where: { id: uid } });
 
