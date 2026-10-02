@@ -50,6 +50,17 @@ export class AlterPersonasForFirebaseUid1789620625948 implements MigrationInterf
         ALTER TABLE personas DROP COLUMN numero_identificacion
     `);
 
+    await queryRunner.query(`
+      IF EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('personas') AND name = 'activo') BEGIN
+        DECLARE @df_activo NVARCHAR(256)
+        SELECT @df_activo = dc.name FROM sys.default_constraints dc
+          JOIN sys.columns c ON dc.parent_object_id = c.object_id AND dc.parent_column_id = c.column_id
+          WHERE c.object_id = OBJECT_ID('personas') AND c.name = 'activo'
+        IF @df_activo IS NOT NULL EXEC('ALTER TABLE personas DROP CONSTRAINT [' + @df_activo + ']')
+        ALTER TABLE personas DROP COLUMN activo
+      END
+    `);
+
     // 4. Agregar columna eps (si no existe)
     await queryRunner.query(`
       IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('personas') AND name = 'eps')

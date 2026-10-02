@@ -27,9 +27,6 @@ export class Persona {
   @OneToMany(() => ContactoEmergencia, (contacto) => contacto.persona)
   contactosEmergencia: ContactoEmergencia[];
 
-  @Column({ type: 'bit', default: true })
-  activo: boolean;
-
   @CreateDateColumn({ type: 'datetime2', name: 'created_at' })
   createdAt: Date;
 

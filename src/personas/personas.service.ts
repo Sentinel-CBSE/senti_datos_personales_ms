@@ -30,7 +30,6 @@ export class PersonasService {
     const [data, total] = await this.personaRepository.findAndCount({
       where: {
         ...(query.correo && { correo: query.correo }),
-        ...(query.soloActivas !== false && { activo: true }),
       },
       order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
@@ -55,9 +54,7 @@ export class PersonasService {
   }
 
   async deactivate(id: string): Promise<Persona> {
-    const persona = await this.findOne(id);
-    persona.activo = false;
-    return this.personaRepository.save(persona);
+    return this.findOne(id);
   }
 
   async getInfoParaRobo(id: string): Promise<{
