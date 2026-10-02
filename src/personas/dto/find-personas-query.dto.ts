@@ -1,22 +1,8 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsBoolean, IsEmail, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsInt, IsOptional, Min } from 'class-validator';
 
 export class FindPersonasQueryDto {
-  @ApiPropertyOptional({ description: 'Filtrar por correo exacto' })
-  @IsOptional()
-  @IsEmail()
-  correo?: string;
-
-  @ApiPropertyOptional({
-    description: 'Si es false, incluye tambien las personas desactivadas',
-    default: true,
-  })
-  @IsOptional()
-  @Type(() => Boolean)
-  @IsBoolean()
-  soloActivas?: boolean;
-
   @ApiPropertyOptional({ default: 1 })
   @IsOptional()
   @Type(() => Number)

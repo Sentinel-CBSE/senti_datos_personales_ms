@@ -28,9 +28,7 @@ export class PersonasService {
     const limit = query.limit ?? 20;
 
     const [data, total] = await this.personaRepository.findAndCount({
-      where: {
-        ...(query.correo && { correo: query.correo }),
-      },
+      where: {},
       order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
@@ -91,7 +89,7 @@ export class PersonasService {
 
       if (errorNumber !== undefined && SQL_SERVER_UNIQUE_VIOLATION_CODES.includes(errorNumber)) {
         throw new ConflictException(
-          'Ya existe una persona registrada con ese correo',
+          'Conflicto al guardar la persona',
         );
       }
       throw error;
