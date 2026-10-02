@@ -22,7 +22,7 @@ import { EmergencyContactRequestDto } from './dto/emergency-contact-request.dto'
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get('profile/data')
+  @Get('profile')
   @ApiOperation({ summary: 'Obtener el perfil del usuario autenticado' })
   @ApiHeader({ name: 'x-firebase-user-id', description: 'Firebase UID del usuario autenticado', required: true })
   @ApiHeader({ name: 'x-firebase-user-email', description: 'Email del usuario autenticado', required: true })
