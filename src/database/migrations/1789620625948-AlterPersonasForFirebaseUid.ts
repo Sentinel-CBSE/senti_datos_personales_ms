@@ -28,6 +28,20 @@ export class AlterPersonasForFirebaseUid1789620625948 implements MigrationInterf
         ALTER TABLE personas DROP COLUMN eps_id
     `);
     await queryRunner.query(`
+      IF EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('personas') AND name = 'nombre')
+        ALTER TABLE personas DROP COLUMN nombre
+    `);
+    await queryRunner.query(`
+      IF EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('personas') AND name = 'correo') BEGIN
+        DECLARE @uq NVARCHAR(256)
+        SELECT @uq = name FROM sys.key_constraints
+          WHERE type = 'UQ' AND parent_object_id = OBJECT_ID('personas')
+            AND name LIKE '%correo%'
+        IF @uq IS NOT NULL EXEC('ALTER TABLE personas DROP CONSTRAINT [' + @uq + ']')
+        ALTER TABLE personas DROP COLUMN correo
+      END
+    `);
+    await queryRunner.query(`
       IF EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('personas') AND name = 'tipo_identificacion')
         ALTER TABLE personas DROP COLUMN tipo_identificacion
     `);

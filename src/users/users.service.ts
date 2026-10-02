@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Persona } from '../personas/entities/persona.entity';
@@ -18,48 +18,41 @@ export class UsersService {
     private readonly contactoRepository: Repository<ContactoEmergencia>,
   ) {}
 
-  extractFirebaseInfo(uid: string | undefined, email: string | undefined): { uid: string; email: string } {
+  extractFirebaseInfo(uid: string | undefined): { uid: string } {
     if (!uid) throw new UnauthorizedException('Header X-Firebase-User-Id requerido');
-    if (!email) throw new UnauthorizedException('Header X-Firebase-User-Email requerido');
-    return { uid, email };
+    return { uid };
   }
 
   async getProfile(uid: string): Promise<UserResponseDto> {
-    const persona = await this.personaRepository.findOne({ where: { id: uid } });
-    if (!persona) throw new NotFoundException(`Usuario ${uid} no encontrado`);
+    let persona = await this.personaRepository.findOne({ where: { id: uid } });
+
+    if (!persona) {
+      persona = this.personaRepository.create({ id: uid, tipoSangre: null, factorRh: null, eps: null });
+      await this.personaRepository.save(persona);
+    }
+
     const contacts = await this.contactoRepository.find({ where: { personaId: uid } });
     return this.toUserResponse(persona, contacts);
   }
 
-  async upsertProfile(uid: string, email: string, dto: UserUpdateBodyDto): Promise<UserResponseDto> {
-    let persona = await this.personaRepository.findOne({ where: { id: uid } });
+  async upsertProfile(uid: string, dto: UserUpdateBodyDto): Promise<UserResponseDto> {
+    const persona = await this.personaRepository.findOne({ where: { id: uid } });
+    if (!persona) throw new NotFoundException(`Usuario ${uid} no encontrado`);
 
-    if (!persona) {
-      persona = this.personaRepository.create({
-        id: uid,
-        correo: email,
-        nombre: dto.displayName ?? '',
-        tipoSangre: dto.bloodTypeLetter ? (dto.bloodTypeLetter as unknown as TipoSangre) : null,
-        factorRh: this.mapRhToDb(dto.bloodTypeRh),
-        eps: dto.eps ?? null,
-      });
-    } else {
-      if (dto.displayName !== undefined) persona.nombre = dto.displayName;
-      if (dto.bloodTypeLetter !== undefined) persona.tipoSangre = dto.bloodTypeLetter as unknown as TipoSangre;
-      if (dto.bloodTypeRh !== undefined) persona.factorRh = this.mapRhToDb(dto.bloodTypeRh);
-      if (dto.eps !== undefined) persona.eps = dto.eps;
-    }
+    if (dto.bloodTypeLetter !== undefined) persona.tipoSangre = dto.bloodTypeLetter as unknown as TipoSangre;
+    if (dto.bloodTypeRh !== undefined) persona.factorRh = this.mapRhToDb(dto.bloodTypeRh);
+    if (dto.eps !== undefined) persona.eps = dto.eps;
 
     await this.personaRepository.save(persona);
     const contacts = await this.contactoRepository.find({ where: { personaId: uid } });
     return this.toUserResponse(persona, contacts);
   }
 
-  async addEmergencyContact(uid: string, email: string, dto: EmergencyContactRequestDto): Promise<UserResponseDto> {
+  async addEmergencyContact(uid: string, dto: EmergencyContactRequestDto): Promise<UserResponseDto> {
     let persona = await this.personaRepository.findOne({ where: { id: uid } });
 
     if (!persona) {
-      persona = this.personaRepository.create({ id: uid, correo: email, nombre: '' });
+      persona = this.personaRepository.create({ id: uid, tipoSangre: null, factorRh: null, eps: null });
       await this.personaRepository.save(persona);
     }
 
@@ -75,9 +68,10 @@ export class UsersService {
     return this.toUserResponse(persona, contacts);
   }
 
-  async updateEmergencyContact(contactId: string, dto: EmergencyContactRequestDto): Promise<UserResponseDto> {
+  async updateEmergencyContact(uid: string, contactId: string, dto: EmergencyContactRequestDto): Promise<UserResponseDto> {
     const contacto = await this.contactoRepository.findOne({ where: { id: contactId } });
     if (!contacto) throw new NotFoundException(`Contacto ${contactId} no encontrado`);
+    if (contacto.personaId !== uid) throw new ForbiddenException('No tienes permiso para modificar este contacto');
 
     contacto.nombre = dto.name;
     contacto.telefono = dto.phoneNumber;
@@ -91,9 +85,10 @@ export class UsersService {
     return this.toUserResponse(persona, contacts);
   }
 
-  async deleteEmergencyContact(contactId: string): Promise<UserResponseDto> {
+  async deleteEmergencyContact(uid: string, contactId: string): Promise<UserResponseDto> {
     const contacto = await this.contactoRepository.findOne({ where: { id: contactId } });
     if (!contacto) throw new NotFoundException(`Contacto ${contactId} no encontrado`);
+    if (contacto.personaId !== uid) throw new ForbiddenException('No tienes permiso para eliminar este contacto');
 
     const personaId = contacto.personaId;
     await this.contactoRepository.remove(contacto);
@@ -121,11 +116,6 @@ export class UsersService {
 
     return {
       uid: persona.id,
-      email: persona.correo,
-      photoUrl: null,
-      displayName: persona.nombre,
-      isAnonymous: false,
-      isEmailVerified: true,
       bloodTypeRh: persona.factorRh === FactorRh.POSITIVO ? 'POSITIVE'
                  : persona.factorRh === FactorRh.NEGATIVO ? 'NEGATIVE'
                  : null,

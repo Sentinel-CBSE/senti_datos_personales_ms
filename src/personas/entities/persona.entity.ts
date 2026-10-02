@@ -15,12 +15,6 @@ export class Persona {
   @PrimaryColumn({ type: 'nvarchar', length: 128 })
   id: string;
 
-  @Column({ type: 'nvarchar', length: 150 })
-  nombre: string;
-
-  @Column({ type: 'nvarchar', length: 150, unique: true })
-  correo: string;
-
   @Column({ type: 'varchar', length: 2, name: 'tipo_sangre', nullable: true })
   tipoSangre: TipoSangre | null;
 

@@ -62,7 +62,6 @@ export class PersonasService {
 
   async getInfoParaRobo(id: string): Promise<{
     id: string;
-    nombre: string;
     tipoSangre: string | null;
     factorRh: string | null;
     eps: string | null;
@@ -73,7 +72,6 @@ export class PersonasService {
 
     return {
       id: persona.id,
-      nombre: persona.nombre,
       tipoSangre: persona.tipoSangre,
       factorRh: persona.factorRh,
       eps: persona.eps,
